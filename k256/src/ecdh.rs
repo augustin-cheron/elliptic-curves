@@ -37,6 +37,9 @@
 //! ```
 
 use crate::{AffinePoint, Secp256k1};
+use crate::ecdsa::sign::Borrow;
+use crate::ecdsa::scalar::NonZeroScalar;
+use crate::ecdsa::AffinePoint;
 
 /// NIST P-256 Ephemeral Diffie-Hellman Secret.
 pub type EphemeralSecret = elliptic_curve::ecdh::EphemeralSecret<Secp256k1>;

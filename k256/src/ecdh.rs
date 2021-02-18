@@ -37,9 +37,7 @@
 //! ```
 
 use crate::{AffinePoint, Secp256k1};
-use crate::ecdsa::sign::Borrow;
-use crate::ecdsa::scalar::NonZeroScalar;
-use crate::ecdsa::AffinePoint;
+use crate::{PublicKey, SecretKey};
 
 /// NIST P-256 Ephemeral Diffie-Hellman Secret.
 pub type EphemeralSecret = elliptic_curve::ecdh::EphemeralSecret<Secp256k1>;
@@ -47,11 +45,20 @@ pub type EphemeralSecret = elliptic_curve::ecdh::EphemeralSecret<Secp256k1>;
 /// Shared secret value computed via ECDH key agreement.
 pub type SharedSecret = elliptic_curve::ecdh::SharedSecret<Secp256k1>;
 
-pub fn diffie_hellman (
-    secret_key: impl Borrow<NonZeroScalar<Secp256k1>>, 
-    public_key: impl Borrow<AffinePoint<Secp256k1>>
-) -> SharedSecret {
-   elliptic_curve::ecdh::diffie_hellman::<Secp256k1>(secret_key,public_key)
+/// Low-level Elliptic Curve Diffie-Hellman (ECDH) function.
+///
+/// Whenever possible, we recommend using the high-level ECDH ephemeral API
+/// provided by [`EphemeralSecret`].
+///
+/// However, if you are implementing a protocol which requires a static scalar
+/// value as part of an ECDH exchange, this API can be used to compute a
+/// [`SharedSecret`] from that value.
+///
+/// ```ignore
+/// let shared_secret = k256::ecdh::diffie_hellman(&secret_key,&public_key);
+/// ```
+pub fn diffie_hellman(secret_key: &SecretKey, public_key: &PublicKey) -> SharedSecret {
+    elliptic_curve::ecdh::diffie_hellman(secret_key.secret_scalar(), public_key.as_affine())
 }
 
 impl From<&AffinePoint> for SharedSecret {

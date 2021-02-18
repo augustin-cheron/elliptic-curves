@@ -44,6 +44,13 @@ pub type EphemeralSecret = elliptic_curve::ecdh::EphemeralSecret<Secp256k1>;
 /// Shared secret value computed via ECDH key agreement.
 pub type SharedSecret = elliptic_curve::ecdh::SharedSecret<Secp256k1>;
 
+pub fn diffie_hellman (
+    secret_key: impl Borrow<NonZeroScalar<Secp256k1>>, 
+    public_key: impl Borrow<AffinePoint<Secp256k1>>
+) -> SharedSecret {
+   elliptic_curve::ecdh::diffie_hellman::<Secp256k1>(secret_key,public_key)
+}
+
 impl From<&AffinePoint> for SharedSecret {
     fn from(affine: &AffinePoint) -> SharedSecret {
         affine.x.to_bytes().into()
